@@ -1,6 +1,8 @@
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404
+from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+
 # Create your views here.
 
 from .models import Product
