@@ -8,6 +8,9 @@ from django.views.generic.list import ListView
 from .models import Product
 from .forms import ProductAddForm, ProductModelForm
 
+class ProductDetailView(DetailView):
+	model = Product
+
 class ProductListView(ListView):
 	model = Product
 	# template_name = "list_view.html"
