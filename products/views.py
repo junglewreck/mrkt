@@ -1,28 +1,28 @@
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
-
-from digitalmarket.mixins import MultiSlugMixin
+from digitalmarket.mixins import MultiSlugMixin, SubmitBtnMixin 
 # Create your views here.
-
-from .models import Product
 from .forms import ProductAddForm, ProductModelForm
 
-class MultiSlugMixin(object):
-	model = None
+from .models import Product
 
-	def get_object(self, *args, **kwargs):
-		slug = self.kwargs.get("slug")
-		ModelClass = self.model
-		if slug is not None:
-			try:
-				obj = get_object_or_404(ModelClass, slug=slug)
-			except ModelClass.MultipleObjectsReturned:
-				obj = ModelClass.objects.filter(slug=slug).order_by("-title").first()
-			else:
-				obj = super(MultiSlugMixin, self).get_object(*args, **kwargs)
-			return obj
+
+class ProductCreateView(CreateView):
+	model = Product
+	template_name = "form.html"
+	form_class = ProductModelForm
+	success_url = "/products/add/"
+	submit_btn = "Add Product"
+
+class ProductUpdateView(MultiSlugMixin, UpdateView):
+	model = Product
+	template_name = "form.html"
+	form_class = ProductModelForm
+	success_url = "/products/"
+	submit_btn = "Update Product"
 
 class ProductDetailView(MultiSlugMixin, DetailView):
 	  model = Product
