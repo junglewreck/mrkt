@@ -3,13 +3,15 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
+from digitalmarket.mixins import MultiSlugMixin
 # Create your views here.
 
 from .models import Product
 from .forms import ProductAddForm, ProductModelForm
 
-class ProductDetailView(DetailView):
-	model = Product
+class MultiSlugMixin(object):
+	model = None
+
 	def get_object(self, *args, **kwargs):
 		slug = self.kwargs.get("slug")
 		ModelClass = self.model
@@ -19,23 +21,18 @@ class ProductDetailView(DetailView):
 			except ModelClass.MultipleObjectsReturned:
 				obj = ModelClass.objects.filter(slug=slug).order_by("-title").first()
 			else:
-				obj = super(ProductDetailView, self).get_object(*args, **kwargs)
+				obj = super(MultiSlugMixin, self).get_object(*args, **kwargs)
 			return obj
 
-		obj = super(ProductDetailView, self).get_object(*args, **kwargs)
-		return obj
+class ProductDetailView(MultiSlugMixin, DetailView):
+	  model = Product
+
+
 class ProductListView(ListView):
 	model = Product
-	# template_name = "list_view.html"
-	#
-	# def get_context_data(self, **kwargs):
-	# 	context = super(ProductListView, self).get_context_data(**kwargs)
-	# 	print context
-	# 	context['queryset'] = self.get_queryset()
-	# 	return context
+
 	def get_queryset(self, *args, **kwargs):
 		qs = super(ProductListView, self).get_queryset(**kwargs)
-		#qs = qs.filter(title__icontains="pill") #filter_shit
 		return qs
 
 def create_view(request):
