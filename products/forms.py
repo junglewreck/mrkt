@@ -1,5 +1,7 @@
 from django import forms
 from .models import Product
+from django.utils.text import slugify
+
 PUBLISH_CHOICES = (
     #('', ""),
     ('publish', 'Publish'),
@@ -66,6 +68,15 @@ class ProductModelForm(forms.ModelForm):
                 }
             )
         }
+
+    def clean(self, *args, **kwargs):
+        cleaned_data = super(ProductModelForm, self).clean(*args, **kwargs)
+        # title = cleaned_data.get("title")
+        # slug = slugify(title)
+        # qs = Product.objects.filter(slug=slug).exists()
+        # if qs:
+        #     raise forms.ValidationError("A new title is need")
+        return cleaned_data 
     def clean_price(self):
             price = self.cleaned_data.get("price")
             if price <= 1.00:
@@ -74,6 +85,9 @@ class ProductModelForm(forms.ModelForm):
                 raise forms.ValidationError("Price must be less than $100.00")
             else:
                 return price
+
+
+
 
     def clean_title(self):
             title = self.cleaned_data.get("title")
