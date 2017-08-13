@@ -3,14 +3,15 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
-from digitalmarket.mixins import MultiSlugMixin, SubmitBtnMixin
+from digitalmarket.mixins import LoginRequiredMixin ,MultiSlugMixin, SubmitBtnMixin
+
 # Create your views here.
 from .forms import ProductAddForm, ProductModelForm
-
+from .mixins import ProductManagerMixin
 from .models import Product
 
 
-class ProductCreateView(SubmitBtnMixin, CreateView):
+class ProductCreateView(LoginRequiredMixin, SubmitBtnMixin, CreateView):
 	model = Product
 	template_name = "form.html"
 	form_class = ProductModelForm
@@ -25,7 +26,7 @@ class ProductCreateView(SubmitBtnMixin, CreateView):
 		#add all default users
 		return valid_data
 
-class ProductUpdateView(SubmitBtnMixin, MultiSlugMixin, UpdateView):
+class ProductUpdateView(ProductManagerMixin, SubmitBtnMixin, MultiSlugMixin, UpdateView):
 	model = Product
 	template_name = "form.html"
 	form_class = ProductModelForm
@@ -33,13 +34,13 @@ class ProductUpdateView(SubmitBtnMixin, MultiSlugMixin, UpdateView):
 	submit_btn = "Update Product"
 
 	#verification
-	def get_object(self, *args, **kwargs):
-		user = self.request.user
-		obj = super(ProductUpdateView, self).get_object(*args, **kwargs)
-		if obj.user == user or user in obj.managers.all():
-			return obj
-		else:
-			raise Http404
+	# def get_object(self, *args, **kwargs):
+	# 	user = self.request.user
+	# 	obj = super(ProductUpdateView, self).get_object(*args, **kwargs)
+	# 	if obj.user == user or user in obj.managers.all():
+	# 		return obj
+	# 	else:
+	# 		raise Http404
 
 
 
